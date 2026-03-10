@@ -34,6 +34,74 @@ Before solving a counting problem, always ask:
 
 These questions determine which combinatorial model should be used.
 
+## Recognizing the Correct Counting Model
+
+When solving a counting problem, the main difficulty is usually not the formula itself, but recognizing which combinatorial model applies.
+
+A useful strategy is to decide step by step:
+
+* are we using all objects or only some of them?
+* does order matter?
+* are repetitions allowed?
+* are the objects distinct or are some of them identical?
+
+The following decision tree summarizes the most common cases.
+
+```text
+Start: What kind of outcome are we counting?
+
+Are we using ALL objects or only SOME objects?
+
+├─ SOME objects
+│  │
+│  ├─ Does order matter?
+│  │  │
+│  │  ├─ No
+│  │  │  └─ Combination
+│  │  │
+│  │  └─ Yes
+│  │     │
+│  │     ├─ Repetition allowed
+│  │     │  └─ Sequences with repetition
+│  │     │
+│  │     └─ No repetition
+│  │        └─ k-permutations
+│  │
+│  └─ Typical idea:
+│     selecting a group, drawing a sample, forming a code, assigning places
+│
+└─ ALL objects
+   │
+   ├─ Are the objects arranged in a row or in a circle?
+   │  │
+   │  ├─ In a row
+   │  │  │
+   │  │  ├─ All objects distinct
+   │  │  │  └─ Permutation
+   │  │  │
+   │  │  └─ Some objects identical
+   │  │     └─ Permutations with repeated elements
+   │  │
+   │  └─ In a circle
+   │     └─ Circular permutation
+   │
+   └─ Typical idea:
+      arranging books, seating people, arranging letters
+```
+
+This decision tree is only a guide, but in many elementary problems it helps identify the correct model immediately.
+
+In practice, students should first decide whether the outcome is:
+
+* a selection,
+* an ordered sequence,
+* a linear arrangement,
+* or a circular arrangement.
+
+They should then check whether repetitions are allowed and whether equal objects are treated as identical.
+
+The sections below explain each of these counting models in more detail.
+
 ---
 
 ## Permutations
