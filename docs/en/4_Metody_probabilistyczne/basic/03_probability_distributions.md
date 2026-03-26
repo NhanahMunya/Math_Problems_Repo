@@ -1,4 +1,4 @@
-# Task List 04 — Probability Distributions (Selected Models)
+# Task List 03 — Probability Distributions (Selected Models)
 
 
 ## Introduction
