@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problem 2 — Die × Die</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+/* ===== DESIGN SYSTEM ===== */
+:root {
+  --ink:       #1a1612;
+  --paper:     #f5f0e8;
+  --cream:     #ede7d9;
+  --rust:      #c0392b;
+  --gold:      #b8860b;
+  --teal:      #2e6b6b;
+  --mist:      #8b9ea8;
+  --marked:    #c0392b;
+  --marked-bg: rgba(192,57,43,0.13);
+  --grid-line: rgba(26,22,18,0.18);
+  --shadow:    0 4px 32px rgba(26,22,18,0.14);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 300;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+/* ===== PAGE STRUCTURE ===== */
+.page-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+/* ===== HEADER ===== */
+header {
+  border-bottom: 2px solid var(--ink);
+  padding: 4rem 0 2rem;
+  margin-bottom: 3.5rem;
+  position: relative;
+}
+
+.header-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mist);
+  margin-bottom: 0.75rem;
+}
+
+header h1 {
+  font-family: 'EB Garamond', serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+header h1 em {
+  font-style: italic;
+  color: var(--rust);
+}
+
+.header-meta {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 1.2rem;
+}
+
+.badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  padding: 0.25em 0.7em;
+  border-radius: 2px;
+  font-weight: 500;
+}
+.badge-green  { background: #27ae60; color: #fff; }
+.badge-blue   { background: #2980b9; color: #fff; }
+.badge-orange { background: #e67e22; color: #fff; }
+
+.header-rule {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: var(--rust);
+}
+
+/* ===== SECTION HEADING ===== */
+.section-heading {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.55rem;
+  font-weight: 500;
+  margin: 3.5rem 0 1.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--grid-line);
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.section-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--rust);
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+
+/* ===== OBJECTIVE BOX ===== */
+.objective-box {
+  background: var(--cream);
+  border-left: 3px solid var(--rust);
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 2.5rem;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #2c2420;
+}
+
+/* ===== SAMPLE SPACE INTRO ===== */
+.prose { font-size: 1.05rem; margin-bottom: 1.2rem; }
+
+.math-display {
+  text-align: center;
+  padding: 1.2rem 0;
+  font-size: 1.1rem;
+  overflow-x: auto;
+}
+
+/* ===== EVENT CARD ===== */
+.event-card {
+  background: #fff;
+  border: 1px solid var(--grid-line);
+  border-radius: 4px;
+  margin: 2.5rem 0;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.event-card:hover { box-shadow: 0 6px 40px rgba(26,22,18,0.18); }
+
+.event-header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.event-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  opacity: 0.5;
+  letter-spacing: 0.12em;
+}
+
+.event-title {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.event-body {
+  padding: 1.5rem;
+}
+
+/* ===== DICE GRID ===== */
+.grid-area {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.grid-wrap {
+  flex: 0 0 auto;
+}
+
+.grid-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mist);
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+.dice-grid {
+  display: grid;
+  grid-template-columns: 28px repeat(6, 38px);
+  grid-template-rows: 28px repeat(6, 38px);
+  gap: 2px;
+  user-select: none;
+}
+
+.grid-corner { /* empty top-left corner */
+  display: flex; align-items: center; justify-content: center;
+}
+
+.axis-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.axis-label.col-label { color: #6b8a9a; }
+.axis-label.row-label { color: #9a6b6b; }
+
+.grid-cell {
+  width: 38px; height: 38px;
+  border: 1px solid var(--grid-line);
+  background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: transparent;
+  transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.15s;
+  cursor: default;
+  position: relative;
+  border-radius: 2px;
+}
+
+.grid-cell.marked {
+  background: var(--marked-bg);
+  border-color: var(--marked);
+  color: var(--marked);
+}
+
+.grid-cell.diagonal {
+  background: rgba(46,107,107,0.12);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.grid-cell:hover {
+  z-index: 2;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(26,22,18,0.2);
+}
+
+.grid-cell.marked:hover { background: rgba(192,57,43,0.22); }
+
+/* dot marker */
+.grid-cell .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--grid-line);
+  opacity: 0.45;
+}
+
+.grid-cell.marked .dot,
+.grid-cell.diagonal .dot { display: none; }
+
+/* ===== AXIS CAPTION ===== */
+.axis-caption {
+  display: flex;
+  gap: 2rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--mist);
+}
+
+/* ===== TABLE ===== */
+.reasoning-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  margin: 1.2rem 0;
+}
+
+.reasoning-table th {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 0.9rem;
+  text-align: center;
+}
+
+.reasoning-table td {
+  padding: 0.45rem 0.9rem;
+  border-bottom: 1px solid var(--grid-line);
+  text-align: center;
+}
+
+.reasoning-table tr:nth-child(even) td { background: var(--cream); }
+.reasoning-table .valid   { color: #27ae60; font-weight: 700; }
+.reasoning-table .invalid { color: #c0392b; font-weight: 700; }
+
+/* ===== OBSERVATION BOX ===== */
+.observation {
+  background: linear-gradient(135deg, #edf6f6 0%, #e8f0f5 100%);
+  border-left: 3px solid var(--teal);
+  padding: 1rem 1.4rem;
+  margin: 1.2rem 0 0;
+  font-size: 0.95rem;
+  border-radius: 0 3px 3px 0;
+}
+
+.observation strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* ===== EVENT SET DISPLAY ===== */
+.event-set {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  background: var(--ink);
+  color: #e8dcc8;
+  padding: 0.8rem 1.1rem;
+  border-radius: 3px;
+  margin: 1rem 0;
+  overflow-x: auto;
+  letter-spacing: 0.03em;
+}
+
+.event-set .pair { color: var(--rust); }
+.event-set .count { 
+  display: inline-block;
+  margin-left: 1rem;
+  color: var(--mist);
+  font-size: 0.72rem;
+}
+
+/* ===== INTERACT HINT ===== */
+.interact-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--mist);
+  margin-bottom: 1rem;
+}
+.interact-hint::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--rust);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
+/* ===== ANIMATE IN ===== */
+.event-card {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.2s;
+}
+.event-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* stagger each cell reveal */
+.grid-cell {
+  opacity: 0;
+  transition: opacity 0.2s, background 0.25s, color 0.25s, border-color 0.25s, transform 0.15s;
+}
+.grid-cell.show {
+  opacity: 1;
+}
+
+/* ===== KEY INSIGHTS ===== */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.insight-card {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1.4rem;
+  border-radius: 3px;
+}
+
+.insight-card h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+
+.insight-card p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  opacity: 0.88;
+}
+
+/* ===== LEGEND ===== */
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  margin: 0.8rem 0;
+  align-items: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.legend-swatch {
+  width: 18px; height: 18px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+.legend-swatch.marked-sw { background: var(--marked-bg); border-color: var(--marked); }
+.legend-swatch.empty-sw  { background: var(--cream); border-color: var(--grid-line); }
+.legend-swatch.diag-sw   { background: rgba(46,107,107,0.12); border-color: var(--teal); }
+
+/* ===== PART DIVIDER ===== */
+.part-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 4rem 0 2rem;
+}
+.part-divider-line { flex: 1; height: 1px; background: var(--grid-line); }
+.part-divider-label {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  color: var(--rust);
+  white-space: nowrap;
+}
+
+/* ===== GRID TOOLTIP ===== */
+.tooltip {
+  position: fixed;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  padding: 0.3em 0.6em;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  margin-top: 5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--grid-line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--mist);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .grid-area { justify-content: center; }
+  .dice-grid {
+    grid-template-columns: 22px repeat(6, 32px);
+    grid-template-rows: 22px repeat(6, 32px);
+  }
+  .grid-cell { width: 32px; height: 32px; font-size: 0.7rem; }
+  .axis-label { font-size: 0.65rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="tooltip" id="tooltip"></div>
+
+<div class="page-wrap">
+
+<!-- HEADER -->
+<header>
+  <p class="header-label">Probability Theory — Sample Space & Events</p>
+  <h1>Problem 2 — <em>Die × Die</em></h1>
+  <div class="header-meta">
+    <span class="badge badge-green">complete</span>
+    <span class="badge badge-blue">discovering formalism</span>
+    <span class="badge badge-orange">sample space & events</span>
+  </div>
+  <div class="header-rule"></div>
+</header>
+
+<!-- OBJECTIVE -->
+<div class="objective-box">
+  Analyse the sample space of two dice rolls using a 6×6 graphical grid. Mark events as subsets of the sample space and interpret graphically represented events as precise verbal statements, with full reasoning for each step.
+</div>
+
+<!-- SAMPLE SPACE -->
+<h2 class="section-heading"><span class="section-number">§0</span> Sample Space</h2>
+
+<p class="prose">The experiment consists of two independent rolls of a fair six-sided die. Each roll produces a result in $\{1,2,3,4,5,6\}$. Since order matters — the first and second roll are distinct stages — each elementary outcome is an <em>ordered pair</em> $(i,j)$ where $i$ is the result of the first die and $j$ is the result of the second.</p>
+
+<div class="math-display">$$\Omega = \{(i,j) \mid i,j \in \{1,2,3,4,5,6\}\}, \quad |\Omega| = 36$$</div>
+
+<p class="prose">In the grid representation, <strong>rows correspond to the first die</strong> (value $i$) and <strong>columns correspond to the second die</strong> (value $j$). An <strong>event</strong> is any subset $A \subseteq \Omega$. Cells marked <span style="color:var(--rust);font-weight:600">✕</span> belong to the event; empty cells do not.</p>
+
+<div class="legend">
+  <span class="legend-item"><span class="legend-swatch marked-sw"></span> Outcome belongs to event</span>
+  <span class="legend-item"><span class="legend-swatch empty-sw"></span> Outcome not in event</span>
+  <span class="legend-item"><span class="legend-swatch diag-sw"></span> Diagonal ($i=j$)</span>
+</div>
+
+<!-- ==============================
+     PART A
+     ============================== -->
+<div class="part-divider">
+  <div class="part-divider-line"></div>
+  <div class="part-divider-label">Part A — Marking Events</div>
+  <div class="part-divider-line"></div>
+</div>
+
+<!-- ── EVENT 1 ── -->
+<div class="event-card" data-event="1">
+  <div class="event-header">
+    <span class="event-number">A.1</span>
+    <span class="event-title">The sum of both dice equals 8</span>
+  </div>
+  <div class="event-body">
+    <p class="interact-hint">Hover over any cell to see its outcome</p>
+
+    <p class="prose">We seek all pairs $(i,j)$ with $i + j = 8$, $i,j \in \{1,\ldots,6\}$. Equivalently $j = 8 - i$; we check validity for each row:</p>
+
+    <table class="reasoning-table">
+      <thead><tr><th>First die $i$</th><th>$j = 8 - i$</th><th>Valid?</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>7</td><td class="invalid">✕ — 7 is not a die face</td></tr>
+        <tr><td>2</td><td>6</td><td class="valid">✓</td></tr>
+        <tr><td>3</td><td>5</td><td class="valid">✓</td></tr>
+        <tr><td>4</td><td>4</td><td class="valid">✓</td></tr>
+        <tr><td>5</td><td>3</td><td class="valid">✓</td></tr>
+        <tr><td>6</td><td>2</td><td class="valid">✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <div class="grid-title">Event A — sum = 8</div>
+        <div class="dice-grid" id="grid-a1" data-marked='[[2,6],[3,5],[4,4],[5,3],[6,2]]'></div>
+        <div class="axis-caption">
+          <span style="color:#9a6b6b">↕ first die (rows)</span>
+          <span style="color:#6b8a9a">↔ second die (cols)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-set">
+      $A = \{$<span class="pair">(2,6), (3,5), (4,4), (5,3), (6,2)</span>$\}$
+      <span class="count">|A| = 5 outcomes</span>
+    </div>
+
+    <div class="observation">
+      <strong>Geometric Observation</strong>
+      Constant-sum events always form <em>diagonal stripes</em> running from lower-left to upper-right (anti-diagonals). The stripe for sum 8 lies <em>above</em> the main diagonal, reflecting that 8 exceeds the average sum of 7. Each unit increase in the target sum shifts the stripe one step toward the upper-right corner.
+    </div>
+  </div>
+</div>
+
+<!-- ── EVENT 2 ── -->
+<div class="event-card" data-event="2">
+  <div class="event-header">
+    <span class="event-number">A.2</span>
+    <span class="event-title">The first die shows a greater value than the second</span>
+  </div>
+  <div class="event-body">
+    <p class="interact-hint">Hover over any cell to see its outcome</p>
+
+    <p class="prose">We need all pairs $(i,j)$ where $i > j$. These lie <em>strictly below the main diagonal</em> of the grid. For each row $i$, the valid columns satisfy $j < i$:</p>
+
+    <table class="reasoning-table">
+      <thead><tr><th>Row $i$</th><th>Valid columns $j$</th><th>Count</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>— (none less than 1)</td><td>0</td></tr>
+        <tr><td>2</td><td>$j = 1$</td><td>1</td></tr>
+        <tr><td>3</td><td>$j = 1, 2$</td><td>2</td></tr>
+        <tr><td>4</td><td>$j = 1, 2, 3$</td><td>3</td></tr>
+        <tr><td>5</td><td>$j = 1, 2, 3, 4$</td><td>4</td></tr>
+        <tr><td>6</td><td>$j = 1, 2, 3, 4, 5$</td><td>5</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <div class="grid-title">Event B — first > second (lower triangle)</div>
+        <div class="dice-grid" id="grid-a2" data-marked='[[2,1],[3,1],[3,2],[4,1],[4,2],[4,3],[5,1],[5,2],[5,3],[5,4],[6,1],[6,2],[6,3],[6,4],[6,5]]'
+             data-diagonal='[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6]]'></div>
+        <div class="axis-caption">
+          <span style="color:#9a6b6b">↕ first die (rows)</span>
+          <span style="color:#6b8a9a">↔ second die (cols)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-set">
+      <span class="count" style="margin-left:0">|B| = 0+1+2+3+4+5 = 15 outcomes</span>
+    </div>
+
+    <div class="observation">
+      <strong>Geometric Observation</strong>
+      The 36 outcomes split into three symmetric regions: lower triangle ($i > j$, 15 outcomes), main diagonal ($i = j$, 6 outcomes), and upper triangle ($i < j$, 15 outcomes). The lower and upper triangles are mirror images — swapping dice maps one to the other — so they have equal size. Together: $15 + 6 + 15 = 36$. ✓
+    </div>
+  </div>
+</div>
+
+<!-- ── EVENT 3 ── -->
+<div class="event-card" data-event="3">
+  <div class="event-header">
+    <span class="event-number">A.3</span>
+    <span class="event-title">Both dice show even numbers</span>
+  </div>
+  <div class="event-body">
+    <p class="interact-hint">Hover over any cell to see its outcome</p>
+
+    <p class="prose">We need $(i,j)$ with $i \in \{2,4,6\}$ <em>and</em> $j \in \{2,4,6\}$. The "and" means both constraints must hold simultaneously — producing a <strong>rectangular sub-grid</strong> at the intersections of even rows and even columns.</p>
+
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <div class="grid-title">Event C — both dice even (3×3 sub-grid)</div>
+        <div class="dice-grid" id="grid-a3" data-marked='[[2,2],[2,4],[2,6],[4,2],[4,4],[4,6],[6,2],[6,4],[6,6]]'></div>
+        <div class="axis-caption">
+          <span style="color:#9a6b6b">↕ first die (rows)</span>
+          <span style="color:#6b8a9a">↔ second die (cols)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-set">
+      <span class="count" style="margin-left:0">|C| = 3 × 3 = 9 outcomes, $P(C) = \tfrac{9}{36} = \tfrac{1}{4}$</span>
+    </div>
+
+    <div class="observation">
+      <strong>Geometric Observation</strong>
+      Restricting both coordinates to a subset of size $k$ (out of 6) produces a $k{\times}k$ sub-grid. Here $k = 3$ even values, so the sub-grid covers $\tfrac{3}{6} \times \tfrac{3}{6} = \tfrac{1}{4}$ of the full grid — consistent with $P = \tfrac{9}{36} = \tfrac{1}{4}$. The even and odd rows/columns interleave symmetrically, making the sub-grid easy to spot as a regular checker pattern.
+    </div>
+  </div>
+</div>
+
+<!-- ── EVENT 4 ── -->
+<div class="event-card" data-event="4">
+  <div class="event-header">
+    <span class="event-number">A.4</span>
+    <span class="event-title">At least one die shows 6</span>
+  </div>
+  <div class="event-body">
+    <p class="interact-hint">Hover over any cell to see its outcome</p>
+
+    <p class="prose">"At least one" is the union of two simpler events. Let $R$ = "first die shows 6" (entire row 6) and $C$ = "second die shows 6" (entire column 6). We want $R \cup C$:</p>
+
+    <div class="math-display">$$|R \cup C| = |R| + |C| - |R \cap C| = 6 + 6 - 1 = 11$$</div>
+
+    <p class="prose">The overlap $R \cap C = \{(6,6)\}$ is counted in both row and column, so we subtract it once.</p>
+
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <div class="grid-title">Event D — at least one die = 6 (L-shape)</div>
+        <div class="dice-grid" id="grid-a4" data-marked='[[1,6],[2,6],[3,6],[4,6],[5,6],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6]]'></div>
+        <div class="axis-caption">
+          <span style="color:#9a6b6b">↕ first die (rows)</span>
+          <span style="color:#6b8a9a">↔ second die (cols)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-set">
+      <span class="count" style="margin-left:0">|D| = 11 outcomes &nbsp;|&nbsp; Complement: $5 \times 5 = 25$, so $36 - 25 = 11$ ✓</span>
+    </div>
+
+    <div class="observation">
+      <strong>Geometric Observation</strong>
+      The event forms an <em>L-shape</em> — the union of the bottom row and the rightmost column. The corner $(6,6)$ belongs to both and is counted once, which is why the count is $6 + 6 - 1 = 11$ rather than 12. Equivalently, the complement "neither die shows 6" is a $5 \times 5$ inner square (25 outcomes), confirming $36 - 25 = 11$.
+    </div>
+  </div>
+</div>
+
+<!-- ── EVENT 5 ── -->
+<div class="event-card" data-event="5">
+  <div class="event-header">
+    <span class="event-number">A.5</span>
+    <span class="event-title">Exactly one die shows 1</span>
+  </div>
+  <div class="event-body">
+    <p class="interact-hint">Hover over any cell to see its outcome</p>
+
+    <p class="prose">"Exactly one" means the two cases are mutually exclusive — we must <em>exclude</em> the corner $(1,1)$ where both dice show 1. Formally this is the symmetric difference of "first die = 1" and "second die = 1":</p>
+
+    <div class="math-display">$$E = (R_1 \setminus C_1) \cup (C_1 \setminus R_1) = R_1 \triangle C_1$$</div>
+
+    <table class="reasoning-table">
+      <thead><tr><th>Sub-case</th><th>Outcomes</th><th>Count</th></tr></thead>
+      <tbody>
+        <tr><td>First = 1, second ≠ 1</td><td>Row 1, cols {2,3,4,5,6}</td><td>5</td></tr>
+        <tr><td>Second = 1, first ≠ 1</td><td>Col 1, rows {2,3,4,5,6}</td><td>5</td></tr>
+        <tr><td style="color:var(--rust)">Both = 1 (excluded)</td><td style="color:var(--rust)">(1,1)</td><td style="color:var(--rust)">−1</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <div class="grid-title">Event E — exactly one die = 1 (L minus corner)</div>
+        <div class="dice-grid" id="grid-a5" data-marked='[[1,2],[1,3],[1,4],[1,5],[1,6],[2,1],[3,1],[4,1],[5,1],[6,1]]'></div>
+        <div class="axis-caption">
+          <span style="color:#9a6b6b">↕ first die (rows)</span>
+          <span style="color:#6b8a9a">↔ second die (cols)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-set">
+      <span class="count" style="margin-left:0">|E| = 5 + 5 = 10 outcomes</span>
+    </div>
+
+    <div class="observation">
+      <strong>Geometric Observation</strong>
+      Compare Events D and E: both produce L-shapes — the union of a row and a column. The critical difference is the corner. "At least one" <em>includes</em> the corner (where both satisfy the condition); "exactly one" <em>excludes</em> it. This is the geometric counterpart of the set-theoretic distinction between union ($A \cup B$) and symmetric difference ($A \triangle B$).
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     PART B
+     ============================== -->
+<div class="part-divider">
+  <div class="part-divider-line"></div>
+  <div class="part-divider-label">Part B — Interpreting Graphical Events</div>
+  <div class="part-divider-line"></div>
+</div>
+
+<!-- ── CASE 1 ── -->
+<div class="event-card" data-event="6">
+  <div class="event-header">
+    <span class="event-number">B.1</span>
+    <span class="event-title">Identify the event shown in this grid</span>
+  </div>
+  <div class="event-body">
+    <p class="interact-hint">Hover over any cell to see its outcome</p>
+
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <div class="grid-title">Given grid — identify the event</div>
+        <div class="dice-grid" id="grid-b1" data-marked='[[3,3],[3,4],[3,5],[3,6],[4,3],[4,4],[4,5],[4,6],[5,3],[5,4],[5,5],[5,6],[6,3],[6,4],[6,5],[6,6]]'></div>
+        <div class="axis-caption">
+          <span style="color:#9a6b6b">↕ first die (rows)</span>
+          <span style="color:#6b8a9a">↔ second die (cols)</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="prose"><strong>Analysis.</strong> The marked region is a solid 4×4 block occupying rows $\{3,4,5,6\}$ and columns $\{3,4,5,6\}$. An outcome $(i,j)$ is marked if and only if <em>both</em> $i \geq 3$ and $j \geq 3$.</p>
+
+    <p class="prose">The unmarked rows $\{1,2\}$ and columns $\{1,2\}$ represent outcomes where at least one die shows 1 or 2. The rectangular block structure arises precisely because <em>two independent</em> constraints (one on $i$, one on $j$) are joined by a logical "and."</p>
+
+    <div class="event-set">
+      <span style="color:#e8dcc8">Event: </span><span class="pair">both dice show a number ≥ 3</span>
+      <span class="count">|F| = 4 × 4 = 16 outcomes</span>
+    </div>
+
+    <div class="observation">
+      <strong>Geometric Observation</strong>
+      A rectangular block always signals a conjunction of two independent threshold constraints — one on each die. The shape of the block (here $4 \times 4$) immediately encodes that each threshold cuts off the same number of values from each axis.
+    </div>
+  </div>
+</div>
+
+<!-- ── CASE 2 ── -->
+<div class="event-card" data-event="7">
+  <div class="event-header">
+    <span class="event-number">B.2</span>
+    <span class="event-title">Identify the event shown in this grid</span>
+  </div>
+  <div class="event-body">
+    <p class="interact-hint">Hover over any cell to see its outcome</p>
+
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <div class="grid-title">Given grid — identify the event</div>
+        <div class="dice-grid" id="grid-b2" data-diagonal='[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6]]'></div>
+        <div class="axis-caption">
+          <span style="color:#9a6b6b">↕ first die (rows)</span>
+          <span style="color:#6b8a9a">↔ second die (cols)</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="prose"><strong>Analysis.</strong> The marked cells are exactly $(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)$ — the <em>main diagonal</em> of the grid. An outcome $(i,j)$ is marked if and only if $i = j$.</p>
+
+    <p class="prose">The diagonal runs from the top-left corner to the bottom-right corner. There is exactly one marked cell per row and per column, because for each value $k \in \{1,\ldots,6\}$ there is precisely one pair $(k,k)$ satisfying $i = j = k$.</p>
+
+    <div class="event-set">
+      <span style="color:#e8dcc8">Event: </span><span class="pair">both dice show the same number</span>
+      <span class="count">|G| = 6 outcomes</span>
+    </div>
+
+    <div class="observation">
+      <strong>Geometric Observation</strong>
+      The main diagonal $\{(k,k) : k \in \{1,\ldots,6\}\}$ is the geometric representation of the relation $i = j$. It divides the grid into the lower triangle ($i > j$) and upper triangle ($i < j$), confirming the three-way partition: $6 + 15 + 15 = 36$. The diagonal is the "tie" region — outcomes where neither die wins.
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     KEY INSIGHTS
+     ============================== -->
+<h2 class="section-heading"><span class="section-number">§∞</span> Key Insights</h2>
+
+<div class="insights-grid">
+  <div class="insight-card">
+    <h4>Rows × Columns</h4>
+    <p>Constraints on only the first die fill entire <em>rows</em>; constraints on only the second die fill entire <em>columns</em>; constraints on both produce <em>rectangular sub-grids</em>.</p>
+  </div>
+  <div class="insight-card">
+    <h4>Geometry → Structure</h4>
+    <p>Diagonal stripes ↔ constant sums. Triangles ↔ inequality events. Rectangular blocks ↔ independent conjunctive constraints. L-shapes ↔ "at least one" unions.</p>
+  </div>
+  <div class="insight-card">
+    <h4>At Least vs. Exactly One</h4>
+    <p>Both produce L-shapes. "At least one" includes the corner; "exactly one" excludes it. This is the geometric form of $A \cup B$ versus $A \triangle B$.</p>
+  </div>
+  <div class="insight-card">
+    <h4>Complement Shortcut</h4>
+    <p>For "at least one die = 6" the complement is a tidy $5 \times 5$ block (25 outcomes): $36 - 25 = 11$. Complements often have simpler geometric shapes.</p>
+  </div>
+  <div class="insight-card">
+    <h4>Symmetry of Dice</h4>
+    <p>Swapping $i \leftrightarrow j$ reflects the grid across the main diagonal. The lower triangle ($i > j$) and upper triangle ($i < j$) are always equal in size: 15 outcomes each.</p>
+  </div>
+  <div class="insight-card">
+    <h4>Sub-grid Probability</h4>
+    <p>A $k \times k$ sub-grid from a size-$k$ restriction on each die covers $k^2/36$ of $\Omega$. For even values, $k=3$: probability $9/36 = 1/4$.</p>
+  </div>
+</div>
+
+<footer>
+  <span>Problem 2 — Die × Die</span>
+  <span>Probability Theory · Sample Space & Events</span>
+</footer>
+
+</div><!-- /page-wrap -->
+
+<script>
+// ── GRID BUILDER ────────────────────────────────────────────────
+function buildGrid(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const markedRaw   = el.dataset.marked   ? JSON.parse(el.dataset.marked)   : [];
+  const diagRaw     = el.dataset.diagonal ? JSON.parse(el.dataset.diagonal) : [];
+
+  const markedSet   = new Set(markedRaw.map(([r,c]) => `${r},${c}`));
+  const diagSet     = new Set(diagRaw.map(([r,c])   => `${r},${c}`));
+
+  // Corner
+  el.innerHTML = '';
+  const corner = document.createElement('div');
+  corner.className = 'grid-corner';
+  el.appendChild(corner);
+
+  // Column headers
+  for (let c = 1; c <= 6; c++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'axis-label col-label';
+    lbl.textContent = c;
+    el.appendChild(lbl);
+  }
+
+  // Rows
+  for (let r = 1; r <= 6; r++) {
+    // Row header
+    const rlbl = document.createElement('div');
+    rlbl.className = 'axis-label row-label';
+    rlbl.textContent = r;
+    el.appendChild(rlbl);
+
+    for (let c = 1; c <= 6; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+
+      const key = `${r},${c}`;
+      if (markedSet.has(key)) {
+        cell.classList.add('marked');
+        cell.textContent = '✕';
+      } else if (diagSet.has(key)) {
+        cell.classList.add('diagonal');
+        cell.textContent = '◆';
+      } else {
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        cell.appendChild(dot);
+      }
+
+      el.appendChild(cell);
+    }
+  }
+
+  // Animate cells in with stagger
+  const cells = el.querySelectorAll('.grid-cell');
+  cells.forEach((cell, idx) => {
+    setTimeout(() => cell.classList.add('show'), idx * 8);
+  });
+}
+
+// ── TOOLTIP ─────────────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+
+document.addEventListener('mouseover', (e) => {
+  const cell = e.target.closest('.grid-cell');
+  if (!cell) { tooltip.style.opacity = 0; return; }
+  const r = cell.dataset.row, c = cell.dataset.col;
+  if (!r) return;
+  tooltip.textContent = `(${r}, ${c})  →  sum = ${+r + +c}`;
+  tooltip.style.opacity = 1;
+});
+
+document.addEventListener('mousemove', (e) => {
+  tooltip.style.left = (e.clientX + 14) + 'px';
+  tooltip.style.top  = (e.clientY - 28) + 'px';
+});
+
+document.addEventListener('mouseout', (e) => {
+  if (!e.target.closest('.grid-cell')) tooltip.style.opacity = 0;
+});
+
+// ── INTERSECTION OBSERVER ────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      const gridId = entry.target.querySelector('.dice-grid')?.id;
+      if (gridId) buildGrid(gridId);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.event-card').forEach(card => observer.observe(card));
+
+// Also render any visible-on-load grids
+setTimeout(() => {
+  document.querySelectorAll('.dice-grid').forEach(g => {
+    if (!g.children.length) buildGrid(g.id);
+  });
+}, 300);
+</script>
+</body>
+</html>
